@@ -20,13 +20,6 @@ For **Refunds**: refunds are **executed directly** (there is no create step) and
 * Agreement-based payments require **PIN only** (no OTP), enabling faster repeat checkouts.
 
 
-
-**Key concepts:**
-- Always check the `status` attribute on execution, query and refund responses
-- Use the `is_complete()` method to verify if a transaction succeeded
-- The `bkash_url` from creation objects is where you need to send users for the payment/agreement (bKash payment/agreement page)
-- Agreement payments require only PIN (no OTP) for faster checkout 
-
 ## Usage
 
 ### Synchronous Client

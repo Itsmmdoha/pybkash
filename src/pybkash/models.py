@@ -321,4 +321,27 @@ class Transaction(StatusMixin):
 
         self.original_trx_amount = original_trx_amount
 
+class AgreementCancellation(StatusMixin):
+    def __init__(
+        self,
+        status_code: str,
+        status_message: str,
+        payment_id: str,
+        agreement_id: str,
+        payer_reference: str,
+        agreement_void_time: str,
+        agreement_status: str,
+    ) -> None:
+        # this is status of the cancellation not the agreement
+        self.status = "Complete" if agreement_status == "Cancelled" else agreement_status # universal status
+        # this is to make StatusMixin is_complete() method work intuitively
+        # the method returns True on status = 'Complete'
+        self.status_code = status_code
+        self.status_message = status_message
+        self.payment_id = payment_id
+        self.agreement_id = agreement_id
+        self.payer_reference = payer_reference
+        self.agreement_void_time = agreement_void_time
+        self.agreement_status = agreement_status
+
 

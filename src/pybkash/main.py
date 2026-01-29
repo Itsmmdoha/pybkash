@@ -1,4 +1,4 @@
-from httpx import Client as SyncClient, AsyncClient as HttpxAsyncClient
+from httpx import Client as SyncClient, AsyncClient as HttpxAsyncClient, Response
 from .token_manager import Token, AsyncToken
 from .exception_handlers import raise_api_exception
 from .models import ( 
@@ -10,6 +10,7 @@ from .models import (
     AgreementQuery, 
     PaymentQuery,
     Transaction,
+    AgreementCancellation
 )
 
 
@@ -59,6 +60,16 @@ class BaseClient:
             intent=response["intent"],
             merchant_invoice_number=response["merchantInvoiceNumber"],
             agreement_id=response.get("agreementID"),
+        )
+    def _create_agreement_cancellation_object(self, response: dict,) -> AgreementCancellation:
+        return AgreementCancellation(
+            status_code=response["statusCode"],
+            status_message=response["statusMessage"],
+            payment_id=response["paymentID"],
+            agreement_id=response["agreementID"],
+            payer_reference=response["payerReference"],
+            agreement_void_time=response["agreementVoidTime"],
+            agreement_status=response["agreementStatus"],
         )
 
 
@@ -266,6 +277,27 @@ class Client(BaseClient):
         """
         response: dict = self._execute(payment_id)
         return self._create_agreement_execution_object(response)
+
+    def cancel_agreement(self, agreement_id: str) -> AgreementCancellation:
+        """Cancels an existing agreement.
+        
+        Args:
+            agreement_id: The agreement ID to be cancelled
+        
+        Returns:
+            AgreementCancellation: Cancellation response response with agreement_id and status
+        
+        Raises:
+            APIError: If agreement cancellation fails
+        """
+        data = {
+            'agreementID': agreement_id
+        }
+        response = self._client.post(url="/tokenized/checkout/agreement/cancel", headers=self.token.get_headers(), json=data)
+        response.raise_for_status()
+        response_json = response.json()
+        raise_api_exception(response_json)
+        return self._create_agreement_cancellation_object(response_json)
 
     def _query(self, payment_id: str) -> dict:
         """queries payments and agreements"""
@@ -477,6 +509,27 @@ class AsyncClient(BaseClient):
         """
         response: dict = await self._execute(payment_id)
         return self._create_agreement_execution_object(response)
+
+    async def cancel_agreement(self, agreement_id: str) -> AgreementCancellation:
+        """Cancels an existing agreement.
+        
+        Args:
+            agreement_id: The agreement ID to be cancelled
+        
+        Returns:
+            AgreementCancellation: Cancellation response response with agreement_id and status
+        
+        Raises:
+            APIError: If agreement cancellation fails
+        """
+        data = {
+            'agreementID': agreement_id
+        }
+        response = await self._client.post(url="/tokenized/checkout/agreement/cancel", headers= await self.token.get_headers(), json=data)
+        response.raise_for_status()
+        response_json = response.json()
+        raise_api_exception(response_json)
+        return self._create_agreement_cancellation_object(response_json)
 
     async def _query(self, payment_id: str) -> dict:
         """queries payments and agreements"""

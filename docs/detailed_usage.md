@@ -4,7 +4,7 @@ The bKash API follows a **3-step process** for agreements and payments:
 
 1. **Create** - Initiates the transaction and returns a `bkash_url` for user authentication
 2. **Execute** - Confirms the transaction after user completes authentication (for payments, money is deducted here)
-3. **Query** - Retrieves transaction details and verifies the `status`
+3. **Query** - Queries transaction details, in case of need in future.
 
 
 **Mental model:**

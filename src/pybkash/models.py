@@ -333,7 +333,7 @@ class AgreementCancellation(StatusMixin):
         agreement_status: str,
     ) -> None:
         # this is status of the cancellation not the agreement
-        self.status = "Complete" if agreement_status == "Cancelled" else agreement_status # universal status
+        self.status = "Completed" if agreement_status == "Cancelled" else agreement_status # universal status
         # this is to make StatusMixin is_complete() method work intuitively
         # the method returns True on status = 'Complete'
         self.status_code = status_code

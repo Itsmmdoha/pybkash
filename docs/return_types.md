@@ -78,7 +78,7 @@ Returned by `execute_agreement()` method. Includes `is_complete()` method.
 **Methods:**
 - `is_complete()` -> bool: Returns True if agreement status is "COMPLETED"
 
-### PaymentQuery
+### Payment
 
 Returned by `query_payment()` method. Includes `is_complete()` method.
 
@@ -104,7 +104,7 @@ Returned by `query_payment()` method. Includes `is_complete()` method.
 **Methods:**
 - `is_complete()` -> bool: Returns True if transaction status is "COMPLETED"
 
-### AgreementQuery
+### Agreement
 
 Returned by `query_agreement()` method. Includes `is_complete()` method.
 

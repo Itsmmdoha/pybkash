@@ -7,8 +7,8 @@ from .models import (
     PaymentExecution, 
     AgreementExecution, 
     RefundExecution, 
-    AgreementQuery, 
-    PaymentQuery,
+    Agreement, 
+    Payment,
     Transaction,
     AgreementCancellation
 )
@@ -85,8 +85,8 @@ class BaseClient:
             agreement_status=response["agreementStatus"],
         )
 
-    def _create_agreement_query_object(self, response: dict) -> AgreementQuery:
-        return AgreementQuery(
+    def _create_agreement_query_object(self, response: dict) -> Agreement:
+        return Agreement(
             status_code=response["statusCode"],
             status_message=response["statusMessage"],
             payment_id=response["paymentID"],
@@ -101,8 +101,8 @@ class BaseClient:
             verification_status=response["verificationStatus"],
         )
 
-    def _create_payment_query_object(self, response: dict) -> PaymentQuery:
-        return PaymentQuery(
+    def _create_payment_query_object(self, response: dict) -> Payment:
+        return Payment(
             status_code=response["statusCode"],
             status_message=response["statusMessage"],
             payment_id=response["paymentID"],
@@ -310,14 +310,14 @@ class Client(BaseClient):
         raise_api_exception(response_json)
         return response_json
 
-    def query_agreement(self, payment_id: str) -> AgreementQuery:
+    def query_agreement(self, payment_id: str) -> Agreement:
         """Queries the status and details of an agreement.
         
         Args:
             payment_id: The payment ID from create_agreement()
         
         Returns:
-            AgreementQuery: Agreement details including status and agreement_id
+            Agreement: Agreement details including status and agreement_id
         
         Raises:
             APIError: If query fails
@@ -325,14 +325,14 @@ class Client(BaseClient):
         response_json: dict = self._query(payment_id)
         return self._create_agreement_query_object(response_json)
 
-    def query_payment(self, payment_id: str) -> PaymentQuery:
+    def query_payment(self, payment_id: str) -> Payment:
         """Queries the status and details of a payment.
         
         Args:
             payment_id: The payment ID from create_payment()
         
         Returns:
-            PaymentQuery: Payment details including status and transaction information
+            Payment: Payment details including status and transaction information
         
         Raises:
             APIError: If query fails
@@ -542,14 +542,14 @@ class AsyncClient(BaseClient):
         raise_api_exception(response_json)
         return response_json
 
-    async def query_agreement(self, payment_id: str) -> AgreementQuery:
+    async def query_agreement(self, payment_id: str) -> Agreement:
         """Queries the status and details of an agreement.
         
         Args:
             payment_id: The payment ID from create_agreement()
         
         Returns:
-            AgreementQuery: Agreement details including status and agreement_id
+            Agreement: Agreement details including status and agreement_id
         
         Raises:
             APIError: If query fails
@@ -557,14 +557,14 @@ class AsyncClient(BaseClient):
         response_json: dict = await self._query(payment_id)
         return self._create_agreement_query_object(response_json)
 
-    async def query_payment(self, payment_id: str) -> PaymentQuery:
+    async def query_payment(self, payment_id: str) -> Payment:
         """Queries the status and details of a payment.
         
         Args:
             payment_id: The payment ID from create_payment()
         
         Returns:
-            PaymentQuery: Payment details including status and transaction information
+            Payment: Payment details including status and transaction information
         
         Raises:
             APIError: If query fails

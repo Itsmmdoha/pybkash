@@ -202,7 +202,7 @@ class PaymentExecution(ExecutionBase):
         self.intent = intent
         self.merchant_invoice_number = merchant_invoice_number
 
-class AgreementQuery(QueryBase):
+class Agreement(QueryBase):
     def __init__(
         self,
         status_code: str,
@@ -234,7 +234,7 @@ class AgreementQuery(QueryBase):
         self.payer_type = payer_type
         self.mode = mode
 
-class PaymentQuery(QueryBase):
+class Payment(QueryBase):
     def __init__(
         self,
         status_code: str,

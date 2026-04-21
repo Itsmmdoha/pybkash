@@ -1,4 +1,4 @@
-from httpx import Client as SyncClient, AsyncClient as HttpxAsyncClient, Response
+from httpx import Client as SyncClient, AsyncClient as HttpxAsyncClient
 from .token_manager import Token, AsyncToken
 from .exception_handlers import raise_api_exception
 from .models import ( 
@@ -160,14 +160,23 @@ class BaseClient:
 
 
 class Client(BaseClient):
-    def __init__(self, token: Token) -> None:
+    def __init__(self, token: Token, timeout: int = 10) -> None:
+        """Initializes the synchronous bKash Client.
+
+        Args:
+            token: An instance of Token for authentication.
+            timeout: Request timeout in seconds. Defaults to 10.
+
+        Raises:
+            TypeError: If an incorrect token type (e.g., AsyncToken) is provided.
+        """
         if not isinstance(token, Token):
             raise TypeError(
                     f"Client requires a Token instance, got {type(token).__name__} instead. "
                     f"Use AsyncToken with the asynchronous AsyncClient class."
                 )
         self.token = token
-        self._client = SyncClient(base_url=token.base_url)
+        self._client = SyncClient(base_url=token.base_url, timeout=timeout)
 
     def close(self) -> None:
         """Closes the HTTP client connection.
@@ -392,14 +401,23 @@ class Client(BaseClient):
 
 
 class AsyncClient(BaseClient):
-    def __init__(self, token: AsyncToken) -> None:
+    def __init__(self, token: AsyncToken, timeout: int = 10) -> None:
+        """Initializes the asynchronous bKash Client.
+
+        Args:
+            token: An instance of AsyncToken for authentication.
+            timeout: Request timeout in seconds. Defaults to 10.
+
+        Raises:
+            TypeError: If an incorrect token type (e.g., synchronous Token) is provided.
+        """
         if not isinstance(token, AsyncToken): # raise error if provided token is not async
             raise TypeError(
                 f"AsyncClient requires an AsyncToken instance, got {type(token).__name__} instead. "
                 f"Use Token with the synchronous Client class."
             )
         self.token = token
-        self._client = HttpxAsyncClient(base_url=token.base_url)
+        self._client = HttpxAsyncClient(base_url=token.base_url, timeout=timeout)
 
     async def aclose(self) -> None:
         """Closes the async HTTP client connection.
@@ -583,7 +601,7 @@ class AsyncClient(BaseClient):
             reason: Optional reason for the refund
         
         Returns:
-            Refund: Refund transaction details including refund_trx_id and status
+            RefundExecution: RefundExecution transaction details including refund_trx_id and status
         
         Raises:
             APIError: If refund fails

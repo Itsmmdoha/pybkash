@@ -66,11 +66,15 @@ token = Token(
     password="your_password", 
     app_key="your_app_key",
     app_secret="your_app_secret",
-    sandbox=True  # Use False for production
+    sandbox=True, # Optional, default is False for production
+    timeout=10    # Optional, default timeout is 10s
 )
 
 # Create client instance
-client = Client(token)
+client = Client(
+    token,
+    timeout=10    # Optional, default timeout is 10s
+)
 ```
 
 ### Payment Methods
@@ -542,10 +546,14 @@ async_token = AsyncToken(
     password="your_password",
     app_key="your_app_key",
     app_secret="your_app_secret",
-    sandbox=True
+    sandbox=True, # Optional, default is False for production
+    timeout=10    # Optional, default timeout is 10s
 )
 
-client = AsyncClient(async_token)
+client = AsyncClient(
+    async_token,
+    timeout=10    # Optional, default timeout is 10s
+)
 ```
 
 ### Using Async Methods

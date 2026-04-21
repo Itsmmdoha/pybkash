@@ -5,8 +5,9 @@ from .exception_handlers import raise_api_exception
 
 class BaseToken:
     """Base class for bKash token management with shared logic."""
-    def __init__(self, username: str, password: str, app_key: str, app_secret: str, sandbox=False) -> None:
+    def __init__(self, username: str, password: str, app_key: str, app_secret: str, timeout: int = 10, sandbox=False) -> None:
         self.base_url = "https://tokenized.pay.bka.sh/v1.2.0-beta"
+        self.timeout = timeout
         if sandbox:
             self.base_url = "https://tokenized.sandbox.bka.sh/v1.2.0-beta"
         
@@ -51,7 +52,8 @@ class Token(BaseToken):
         response = post(
             url=f"{self.base_url}/tokenized/checkout/token/grant",
             headers=self.headers,
-            json=self.data
+            json=self.data,
+            timeout=self.timeout
         )
         response.raise_for_status()
         token_obj = response.json()
@@ -106,9 +108,9 @@ class Token(BaseToken):
 class AsyncToken(BaseToken):
     """Asynchronous bKash token manager."""
     
-    def __init__(self, username: str, password: str, app_key: str, app_secret: str, sandbox=False) -> None:
-        super().__init__(username, password, app_key, app_secret, sandbox)
-        self._client = HttpxAsyncClient(base_url=self.base_url)
+    def __init__(self, username: str, password: str, app_key: str, app_secret: str, timeout: int = 10, sandbox=False) -> None:
+        super().__init__(username, password, app_key, app_secret,timeout, sandbox)
+        self._client = HttpxAsyncClient(base_url=self.base_url, timeout=self.timeout)
     
     async def aclose(self) -> None:
         """Closes the async HTTP client connection.

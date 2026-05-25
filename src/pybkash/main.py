@@ -15,9 +15,9 @@ from .models import (
 
 
 class BaseClient:
-    def __init__(self, timeout: int = 10, max_connections: int = 50, max_keepalive_connections: int = 20) -> None:
+    def __init__(self, timeout: int = 10, max_connections: int = 50, max_keepalive_connections: int = 20, keepalive_expiry: float = 20.0) -> None:
         self.timeout = timeout
-        self._limits = Limits(max_connections=max_connections, max_keepalive_connections=max_keepalive_connections)
+        self._limits = Limits(max_connections=max_connections, max_keepalive_connections=max_keepalive_connections, keepalive_expiry=keepalive_expiry)
 
     def _create_agreement_object(self, response: dict) -> AgreementCreation:
         return AgreementCreation(
@@ -164,7 +164,7 @@ class BaseClient:
 
 
 class Client(BaseClient):
-    def __init__(self, token: Token, timeout: int = 10, max_connections: int = 50, max_keepalive_connections: int = 20) -> None:
+    def __init__(self, token: Token, timeout: int = 10, max_connections: int = 50, max_keepalive_connections: int = 20, keepalive_expiry: float = 20.0) -> None:
         """Initializes the synchronous bKash client.
 
         Args:
@@ -172,6 +172,7 @@ class Client(BaseClient):
             timeout: Request timeout in seconds. Defaults to 10.
             max_connections: Maximum number of concurrent connections used for requests. Defaults to 50.
             max_keepalive_connections: Maximum number of idle reusable connections to keep. Defaults to 20.
+            keepalive_expiry: Time in seconds to keep an idle connection open for reuse. Defaults to 30.0.
 
         Raises:
             TypeError: If an incorrect token type is provided
@@ -181,7 +182,7 @@ class Client(BaseClient):
                     f"Client requires a Token instance, got {type(token).__name__} instead. "
                     f"Use AsyncToken with the asynchronous AsyncClient class."
                 )
-        super().__init__(timeout, max_connections, max_keepalive_connections)
+        super().__init__(timeout, max_connections, max_keepalive_connections, keepalive_expiry)
         self.token = token
         self._client = SyncClient(base_url=token.base_url, timeout=timeout, limits=self._limits)
 
@@ -414,7 +415,7 @@ class Client(BaseClient):
 
 
 class AsyncClient(BaseClient):
-    def __init__(self, token: AsyncToken, timeout: int = 10, max_connections: int = 50, max_keepalive_connections: int = 20) -> None:
+    def __init__(self, token: AsyncToken, timeout: int = 10, max_connections: int = 50, max_keepalive_connections: int = 20, keepalive_expiry: float = 20.0) -> None:
         """Initializes the asynchronous bKash Client.
 
         Args:
@@ -422,6 +423,7 @@ class AsyncClient(BaseClient):
             timeout: Request timeout in seconds. Defaults to 10.
             max_connections: Maximum number of concurrent connections used for requests. Defaults to 50.
             max_keepalive_connections: Maximum number of idle reusable connections to keep. Defaults to 20.
+            keepalive_expiry: Time in seconds to keep an idle connection open for reuse before it is closed. Defaults to 30.0.
 
         Raises:
             TypeError: If an incorrect token type (e.g., synchronous Token) is provided.
@@ -431,7 +433,7 @@ class AsyncClient(BaseClient):
                 f"AsyncClient requires an AsyncToken instance, got {type(token).__name__} instead. "
                 f"Use Token with the synchronous Client class."
             )
-        super().__init__(timeout, max_connections, max_keepalive_connections)
+        super().__init__(timeout, max_connections, max_keepalive_connections, keepalive_expiry)
         self.token = token
         self._client = HttpxAsyncClient(base_url=token.base_url, timeout=timeout, limits=self._limits)
 

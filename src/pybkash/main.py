@@ -165,14 +165,16 @@ class BaseClient:
 
 class Client(BaseClient):
     def __init__(self, token: Token, timeout: int = 10, max_connections: int = 50, max_keepalive_connections: int = 20) -> None:
-        """Initializes the synchronous bKash Client.
+        """Initializes the synchronous bKash client.
 
         Args:
-            token: An instance of Token for authentication.
+            token: Authentication token manager instance.
             timeout: Request timeout in seconds. Defaults to 10.
+            max_connections: Maximum number of concurrent connections used for requests. Defaults to 50.
+            max_keepalive_connections: Maximum number of idle reusable connections to keep. Defaults to 20.
 
         Raises:
-            TypeError: If an incorrect token type (e.g., AsyncToken) is provided.
+            TypeError: If an incorrect token type is provided
         """
         if not isinstance(token, Token):
             raise TypeError(
@@ -418,6 +420,8 @@ class AsyncClient(BaseClient):
         Args:
             token: An instance of AsyncToken for authentication.
             timeout: Request timeout in seconds. Defaults to 10.
+            max_connections: Maximum number of concurrent connections used for requests. Defaults to 50.
+            max_keepalive_connections: Maximum number of idle reusable connections to keep. Defaults to 20.
 
         Raises:
             TypeError: If an incorrect token type (e.g., synchronous Token) is provided.

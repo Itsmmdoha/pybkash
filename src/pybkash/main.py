@@ -203,7 +203,7 @@ class Client(BaseClient):
             "callbackURL": callback_url,
             "payerReference": payer_reference,
         }
-        response = self._client.post(url="/tokenized/checkout/create",headers=self.token.get_headers(), json=data)
+        response = self._client.post(url="/tokenized/checkout/create",headers=self.token.get_headers(self._client), json=data)
         response.raise_for_status()
         response_json = response.json()
         raise_api_exception(response_json)
@@ -242,7 +242,7 @@ class Client(BaseClient):
             data["merchantInvoiceNumber"] = invoice_number
         if merchant_association_info:
             data["merchantAssociationInfo"] = merchant_association_info 
-        response = self._client.post(url="/tokenized/checkout/create",headers=self.token.get_headers(), json=data)
+        response = self._client.post(url="/tokenized/checkout/create",headers=self.token.get_headers(self._client), json=data)
         response.raise_for_status()
         response_json = response.json()
         raise_api_exception(response_json)
@@ -252,7 +252,7 @@ class Client(BaseClient):
         data = {
             "paymentID" : payment_id
         }
-        response = self._client.post(url="/tokenized/checkout/execute",headers=self.token.get_headers(), json=data)
+        response = self._client.post(url="/tokenized/checkout/execute",headers=self.token.get_headers(self._client), json=data)
         response.raise_for_status()
         response_json = response.json()
         raise_api_exception(response_json)
@@ -302,7 +302,7 @@ class Client(BaseClient):
         data = {
             'agreementID': agreement_id
         }
-        response = self._client.post(url="/tokenized/checkout/agreement/cancel", headers=self.token.get_headers(), json=data)
+        response = self._client.post(url="/tokenized/checkout/agreement/cancel", headers=self.token.get_headers(self._client), json=data)
         response.raise_for_status()
         response_json = response.json()
         raise_api_exception(response_json)
@@ -313,7 +313,7 @@ class Client(BaseClient):
         data = {
             "paymentID" : payment_id
         }
-        response = self._client.post(url="/tokenized/checkout/payment/status",headers=self.token.get_headers(), json=data)
+        response = self._client.post(url="/tokenized/checkout/payment/status",headers=self.token.get_headers(self._client), json=data)
         response.raise_for_status()
         response_json = response.json()
         raise_api_exception(response_json)
@@ -372,7 +372,7 @@ class Client(BaseClient):
             "sku": sku or "not_provided",
             "reason": reason or "not_provided"
         }
-        response = self._client.post(url="/tokenized/checkout/payment/refund", headers=self.token.get_headers(), json=data)
+        response = self._client.post(url="/tokenized/checkout/payment/refund", headers=self.token.get_headers(self._client), json=data)
         response.raise_for_status()
         response_json = response.json()
         raise_api_exception(response_json)
@@ -393,7 +393,7 @@ class Client(BaseClient):
         data = {
             "trxID" : trx_id
         }
-        response = self._client.post(url="/tokenized/checkout/general/searchTransaction",headers=self.token.get_headers(), json=data)
+        response = self._client.post(url="/tokenized/checkout/general/searchTransaction",headers=self.token.get_headers(self._client), json=data)
         response.raise_for_status()
         response_json = response.json()
         raise_api_exception(response_json)
@@ -444,7 +444,7 @@ class AsyncClient(BaseClient):
             "callbackURL": callback_url,
             "payerReference": payer_reference,
         }
-        response = await self._client.post(url="/tokenized/checkout/create",headers= await self.token.get_headers(), json=data)
+        response = await self._client.post(url="/tokenized/checkout/create",headers= await self.token.get_headers(self._client), json=data)
         response.raise_for_status()
         response_json = response.json()
         raise_api_exception(response_json)
@@ -483,7 +483,7 @@ class AsyncClient(BaseClient):
             data["merchantInvoiceNumber"] = invoice_number
         if merchant_association_info:
             data["merchantAssociationInfo"] = merchant_association_info 
-        response = await self._client.post(url="/tokenized/checkout/create",headers=await self.token.get_headers(), json=data)
+        response = await self._client.post(url="/tokenized/checkout/create",headers=await self.token.get_headers(self._client), json=data)
         response.raise_for_status()
         response_json = response.json()
         raise_api_exception(response_json)
@@ -493,7 +493,7 @@ class AsyncClient(BaseClient):
         data = {
             "paymentID" : payment_id
         }
-        response = await self._client.post(url="/tokenized/checkout/execute",headers= await self.token.get_headers(), json=data)
+        response = await self._client.post(url="/tokenized/checkout/execute",headers= await self.token.get_headers(self._client), json=data)
         response.raise_for_status()
         response_json = response.json()
         raise_api_exception(response_json)
@@ -543,7 +543,7 @@ class AsyncClient(BaseClient):
         data = {
             'agreementID': agreement_id
         }
-        response = await self._client.post(url="/tokenized/checkout/agreement/cancel", headers= await self.token.get_headers(), json=data)
+        response = await self._client.post(url="/tokenized/checkout/agreement/cancel", headers= await self.token.get_headers(self._client), json=data)
         response.raise_for_status()
         response_json = response.json()
         raise_api_exception(response_json)
@@ -554,7 +554,7 @@ class AsyncClient(BaseClient):
         data = {
             "paymentID" : payment_id
         }
-        response = await self._client.post(url="/tokenized/checkout/payment/status",headers=await self.token.get_headers(), json=data)
+        response = await self._client.post(url="/tokenized/checkout/payment/status",headers=await self.token.get_headers(self._client), json=data)
         response.raise_for_status()
         response_json = response.json()
         raise_api_exception(response_json)
@@ -613,7 +613,7 @@ class AsyncClient(BaseClient):
             "sku": sku or "not_provided",
             "reason": reason or "not_provided"
         }
-        response = await self._client.post(url="/tokenized/checkout/payment/refund", headers=await self.token.get_headers(), json=data)
+        response = await self._client.post(url="/tokenized/checkout/payment/refund", headers=await self.token.get_headers(self._client), json=data)
         response.raise_for_status()
         response_json = response.json()
         raise_api_exception(response_json)
@@ -634,7 +634,7 @@ class AsyncClient(BaseClient):
         data = {
             "trxID" : trx_id
         }
-        response = await self._client.post(url="/tokenized/checkout/general/searchTransaction",headers=await self.token.get_headers(), json=data)
+        response = await self._client.post(url="/tokenized/checkout/general/searchTransaction",headers=await self.token.get_headers(self._client), json=data)
         response.raise_for_status()
         response_json = response.json()
         raise_api_exception(response_json)

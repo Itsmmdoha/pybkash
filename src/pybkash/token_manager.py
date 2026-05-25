@@ -5,9 +5,8 @@ from .exception_handlers import raise_api_exception
 
 class BaseToken:
     """Base class for bKash token management with shared logic."""
-    def __init__(self, username: str, password: str, app_key: str, app_secret: str, timeout: int = 10, sandbox=False) -> None:
+    def __init__(self, username: str, password: str, app_key: str, app_secret: str, sandbox=False) -> None:
         self.base_url = "https://tokenized.pay.bka.sh/v1.2.0-beta"
-        self.timeout = timeout
         if sandbox:
             self.base_url = "https://tokenized.sandbox.bka.sh/v1.2.0-beta"
         
@@ -107,8 +106,8 @@ class Token(BaseToken):
 class AsyncToken(BaseToken):
     """Asynchronous bKash token manager."""
     
-    def __init__(self, username: str, password: str, app_key: str, app_secret: str, timeout: int = 10, sandbox=False) -> None:
-        super().__init__(username, password, app_key, app_secret,timeout, sandbox)
+    def __init__(self, username: str, password: str, app_key: str, app_secret: str, sandbox=False) -> None:
+        super().__init__(username, password, app_key, app_secret, sandbox)
     
     async def _fetch_from_api(self, async_client: HttpxAsyncClient) -> dict:
         """Fetch a new token from the bKash API."""

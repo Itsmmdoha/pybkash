@@ -1,4 +1,4 @@
-from httpx import Client as SyncClient, AsyncClient as HttpxAsyncClient
+from httpx import Client as SyncClient, AsyncClient as HttpxAsyncClient, Limits
 from .token_manager import Token, AsyncToken
 from .exception_handlers import raise_api_exception
 from .models import ( 
@@ -15,6 +15,10 @@ from .models import (
 
 
 class BaseClient:
+    def __init__(self, timeout: int = 10, max_connections: int = 50, max_keepalive_connections: int = 20) -> None:
+        self.timeout = timeout
+        self._limits = Limits(max_connections=max_connections, max_keepalive_connections=max_keepalive_connections)
+
     def _create_agreement_object(self, response: dict) -> AgreementCreation:
         return AgreementCreation(
             status_code=response["statusCode"],
@@ -160,7 +164,7 @@ class BaseClient:
 
 
 class Client(BaseClient):
-    def __init__(self, token: Token, timeout: int = 10) -> None:
+    def __init__(self, token: Token, timeout: int = 10, max_connections: int = 50, max_keepalive_connections: int = 20) -> None:
         """Initializes the synchronous bKash Client.
 
         Args:
@@ -175,8 +179,9 @@ class Client(BaseClient):
                     f"Client requires a Token instance, got {type(token).__name__} instead. "
                     f"Use AsyncToken with the asynchronous AsyncClient class."
                 )
+        super().__init__(timeout, max_connections, max_keepalive_connections)
         self.token = token
-        self._client = SyncClient(base_url=token.base_url, timeout=timeout)
+        self._client = SyncClient(base_url=token.base_url, timeout=timeout, limits=self._limits)
 
     def close(self) -> None:
         """Closes the HTTP client connection.
@@ -401,7 +406,7 @@ class Client(BaseClient):
 
 
 class AsyncClient(BaseClient):
-    def __init__(self, token: AsyncToken, timeout: int = 10) -> None:
+    def __init__(self, token: AsyncToken, timeout: int = 10, max_connections: int = 50, max_keepalive_connections: int = 20) -> None:
         """Initializes the asynchronous bKash Client.
 
         Args:
@@ -416,8 +421,9 @@ class AsyncClient(BaseClient):
                 f"AsyncClient requires an AsyncToken instance, got {type(token).__name__} instead. "
                 f"Use Token with the synchronous Client class."
             )
+        super().__init__(timeout, max_connections, max_keepalive_connections)
         self.token = token
-        self._client = HttpxAsyncClient(base_url=token.base_url, timeout=timeout)
+        self._client = HttpxAsyncClient(base_url=token.base_url, timeout=timeout, limits=self._limits)
 
     async def aclose(self) -> None:
         """Closes the async HTTP client connection.

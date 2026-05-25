@@ -105,10 +105,6 @@ class Token(BaseToken):
 
 class AsyncToken(BaseToken):
     """Asynchronous bKash token manager."""
-    
-    def __init__(self, username: str, password: str, app_key: str, app_secret: str, sandbox=False) -> None:
-        super().__init__(username, password, app_key, app_secret, sandbox)
-    
     async def _fetch_from_api(self, async_client: HttpxAsyncClient) -> dict:
         """Fetch a new token from the bKash API."""
         response = await async_client.post(

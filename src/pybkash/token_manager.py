@@ -1,4 +1,4 @@
-from httpx import post, AsyncClient as HttpxAsyncClient
+from httpx import Client as SyncClient, AsyncClient as HttpxAsyncClient 
 from time import time
 from .exception_handlers import raise_api_exception
 
@@ -15,7 +15,7 @@ class BaseToken:
         self.app_key = app_key
         self.timestamp = 0
         self.expires_in = 0
-        self.id_token = None
+        self.id_token: str = ""
         
         self.headers = {
             "username": username,
@@ -28,7 +28,7 @@ class BaseToken:
     
     def _load_token(self, token: dict) -> None:
         """Load token data into instance variables."""
-        self.id_token = token.get("id_token")
+        self.id_token = token.get("id_token") or ""
         self.timestamp = token.get("timestamp")
         self.expires_in = token.get("expires_in")
     
@@ -47,19 +47,18 @@ class BaseToken:
 class Token(BaseToken):
     """Synchronous bKash token manager."""
     
-    def _fetch_from_api(self) -> dict:
+    def _fetch_from_api(self, sync_client: SyncClient) -> dict:
         """Fetch a new token from the bKash API."""
-        response = post(
+        response = sync_client.post(
             url=f"{self.base_url}/tokenized/checkout/token/grant",
             headers=self.headers,
             json=self.data,
-            timeout=self.timeout
         )
         response.raise_for_status()
         token_obj = response.json()
         return self._process_token_response(token_obj)
     
-    def get_token_id(self) -> str:
+    def get_token_id(self, sync_client: SyncClient) -> str:
         """Gets a valid bKash API token ID.
         
         Returns a cached token if available, otherwise fetches a new one.
@@ -73,11 +72,11 @@ class Token(BaseToken):
         if self._is_token_valid():
             return self.id_token
         
-        token = self._fetch_from_api()
+        token = self._fetch_from_api(sync_client)
         self._load_token(token)
         return self.id_token
     
-    def get_new_token_id(self) -> str:
+    def get_new_token_id(self, sync_client: SyncClient) -> str:
         """Forces a fresh token fetch from the bKash API.
         
         Returns:
@@ -86,11 +85,11 @@ class Token(BaseToken):
         Raises:
             APIError: If token fetch fails
         """
-        token = self._fetch_from_api()
+        token = self._fetch_from_api(sync_client)
         self._load_token(token)
         return self.id_token
     
-    def get_headers(self) -> dict:
+    def get_headers(self, sync_client: SyncClient) -> dict:
         """Returns authorization headers for bKash API requests.
         
         Returns:
@@ -100,7 +99,7 @@ class Token(BaseToken):
             APIError: If token retrieval fails
         """
         return {
-            "authorization": str(self.get_token_id()),
+            "authorization": str(self.get_token_id(sync_client)),
             "X-APP-Key": self.app_key
         }
 
@@ -110,18 +109,10 @@ class AsyncToken(BaseToken):
     
     def __init__(self, username: str, password: str, app_key: str, app_secret: str, timeout: int = 10, sandbox=False) -> None:
         super().__init__(username, password, app_key, app_secret,timeout, sandbox)
-        self._client = HttpxAsyncClient(base_url=self.base_url, timeout=self.timeout)
     
-    async def aclose(self) -> None:
-        """Closes the async HTTP client connection.
-        
-        Should be called when done using the token manager to clean up resources.
-        """
-        await self._client.aclose()
-    
-    async def _fetch_from_api(self) -> dict:
+    async def _fetch_from_api(self, async_client: HttpxAsyncClient) -> dict:
         """Fetch a new token from the bKash API."""
-        response = await self._client.post(
+        response = await async_client.post(
             url="/tokenized/checkout/token/grant",
             headers=self.headers,
             json=self.data
@@ -130,7 +121,7 @@ class AsyncToken(BaseToken):
         token_obj = response.json()
         return self._process_token_response(token_obj)
     
-    async def get_token_id(self) -> str:
+    async def get_token_id(self, async_client: HttpxAsyncClient) -> str:
         """Gets a valid bKash API token ID.
         
         Returns a cached token if available, otherwise fetches a new one.
@@ -144,11 +135,11 @@ class AsyncToken(BaseToken):
         if self._is_token_valid():
             return self.id_token
         
-        token = await self._fetch_from_api()
+        token = await self._fetch_from_api(async_client)
         self._load_token(token)
         return self.id_token
     
-    async def get_new_token_id(self) -> str:
+    async def get_new_token_id(self, async_client: HttpxAsyncClient) -> str:
         """Forces a fresh token fetch from the bKash API.
         
         Returns:
@@ -157,11 +148,11 @@ class AsyncToken(BaseToken):
         Raises:
             APIError: If token fetch fails
         """
-        token = await self._fetch_from_api()
+        token = await self._fetch_from_api(async_client)
         self._load_token(token)
         return self.id_token
     
-    async def get_headers(self) -> dict:
+    async def get_headers(self, async_client: HttpxAsyncClient) -> dict:
         """Returns authorization headers for bKash API requests.
         
         Returns:
@@ -171,6 +162,6 @@ class AsyncToken(BaseToken):
             APIError: If token retrieval fails
         """
         return {
-            "authorization": str(await self.get_token_id()),
+            "authorization": str(await self.get_token_id(async_client)),
             "X-APP-Key": self.app_key
         }

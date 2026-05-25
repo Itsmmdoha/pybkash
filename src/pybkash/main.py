@@ -189,6 +189,12 @@ class Client(BaseClient):
         Should be called when done using the client to clean up resources.
         """
         self._client.close()
+    
+    def __enter__(self) -> "Client":
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        self.close()
 
     def create_agreement(self, callback_url: str, payer_reference: str) -> AgreementCreation:
         """Creates a new bKash agreement for tokenized payments.
@@ -431,6 +437,12 @@ class AsyncClient(BaseClient):
         Should be called when done using the client to clean up resources.
         """
         await self._client.aclose()
+
+    async def __aenter__(self) -> "AsyncClient":
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb) -> None:
+        await self.aclose()
 
     async def create_agreement(self, callback_url: str, payer_reference: str) -> AgreementCreation:
         """Creates a new bKash agreement for tokenized payments.

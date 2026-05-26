@@ -49,6 +49,9 @@ For **Refunds**: refunds are **executed directly** (there is no create step) and
   - [Using Async Methods](#using-async-methods)
   - [Complete Async Payment Example](#complete-async-payment-example)
   - [Using with Web Frameworks](#using-with-web-frameworks)
+- [Context Managers](#context-managers)
+  - [Synchronous](#synchronous)
+  - [Asynchronous](#asynchronous)
 
 
 ## Synchronous Client
@@ -66,14 +69,16 @@ token = Token(
     password="your_password", 
     app_key="your_app_key",
     app_secret="your_app_secret",
-    sandbox=True, # Optional, default is False for production
-    timeout=10    # Optional, default timeout is 10s
+    sandbox=True  # Optional, default is False for production
 )
 
 # Create client instance
 client = Client(
     token,
-    timeout=10    # Optional, default timeout is 10s
+    timeout=10,  # Optional, default timeout is 10s
+    max_connections=50,  # Optional, max concurrent connections. Defaults to 50.
+    max_keepalive_connections=20,  # Optional, max idle connections to keep. Defaults to 20.
+    keepalive_expiry=20.0  # Optional, idle connection expiry time in seconds. Defaults to 20.0.
 )
 ```
 
@@ -546,13 +551,15 @@ async_token = AsyncToken(
     password="your_password",
     app_key="your_app_key",
     app_secret="your_app_secret",
-    sandbox=True, # Optional, default is False for production
-    timeout=10    # Optional, default timeout is 10s
+    sandbox=True  # Optional, default is False for production
 )
 
 client = AsyncClient(
     async_token,
-    timeout=10    # Optional, default timeout is 10s
+    timeout=10,  # Optional, default timeout is 10s
+    max_connections=50,  # Optional, max concurrent connections. Defaults to 50.
+    max_keepalive_connections=20,  # Optional, max idle connections to keep. Defaults to 20.
+    keepalive_expiry=20.0  # Optional, idle connection expiry time in seconds. Defaults to 20.0.
 )
 ```
 
@@ -675,5 +682,59 @@ if __name__ == "__main__":
 ```
 
 ---
+
+
+
+## Context Managers
+
+Both clients support the context manager protocol for automatic resource cleanup, so you never need to call `close()` / `aclose()` manually.
+
+### Synchronous
+
+```python
+from pybkash import Client, Token
+
+token = Token(
+    username="your_username",
+    password="your_password",
+    app_key="your_app_key",
+    app_secret="your_app_secret",
+    sandbox=True
+)
+
+with Client(token) as client:
+    payment = client.create_payment(
+        callback_url="https://yoursite.com/callback",
+        payer_reference="CUSTOMER001",
+        amount=1000
+    )
+    # Client automatically closes when exiting the block
+```
+
+### Asynchronous
+
+```python
+import asyncio
+from pybkash import AsyncClient, AsyncToken
+
+async def process_payment():
+    async_token = AsyncToken(
+        username="your_username",
+        password="your_password",
+        app_key="your_app_key",
+        app_secret="your_app_secret",
+        sandbox=True
+    )
+
+    async with AsyncClient(async_token) as client:
+        payment = await client.create_payment(
+            callback_url="https://yoursite.com/callback",
+            payer_reference="CUSTOMER001",
+            amount=1000
+        )
+        # Client automatically closes when exiting the block
+
+asyncio.run(process_payment())
+```
 
 For more information about the bKash API, visit the [official bKash API documentation](https://developer.bka.sh/).

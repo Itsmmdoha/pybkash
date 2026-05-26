@@ -24,6 +24,14 @@ class BaseToken:
             "app_key": app_key,
             "app_secret": app_secret
         }
+
+    def __repr__(self) -> str:
+        return (
+            f"username='{self.username[:3]}{'*' * (len(self.username) - 3)}', "
+            f"app_key='{self.app_key[:4]}{'*' * (len(self.app_key) - 4)}', "
+            f"base_url='{self.base_url}', "
+            f")"
+        )
     
     def _load_token(self, token: dict) -> None:
         """Load token data into instance variables."""

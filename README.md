@@ -9,6 +9,7 @@ A Pythonic client for the bKash payment gateway. Supports both synchronous and a
 3. Agreement Payment
 4. Refund
 5. Search Transaction
+6. Token caching (in-memory or Redis)
 
 ## Installation
 

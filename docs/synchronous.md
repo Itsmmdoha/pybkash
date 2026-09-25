@@ -48,7 +48,7 @@ payment = client.create_payment(
 **Parameters:**
 - `callback_url` (str, required): URL where bKash redirects after authentication
 - `payer_reference` (str, required): Unique reference for the payer (phone/bKash number pre-populates checkout). Max length is 255 characters. Special characters "<", ">" and "&" are not allowed.
-- `amount` (float, required): Payment amount in BDT. At least 1, up to 2 decimal places; otherwise raises `ValueError`.
+- `amount` (float, required): Payment amount in BDT. Must be greater than or equal to 1 with at most 2 decimal places; otherwise raises `ValueError`.
 - `agreement_id` (str, optional): Agreement ID for tokenized payment (enables PIN-only flow)
 - `invoice_number` (str, optional): Merchant invoice number
 - `merchant_association_info` (str, optional): Merchant association information
@@ -291,7 +291,7 @@ if refund.is_complete():
 **Parameters:**
 - `payment_id` (str, required): Payment ID from the original payment
 - `trx_id` (str, required): Transaction ID from the original payment
-- `refund_amount` (float, required): Amount to refund in BDT. At least 1, up to 2 decimal places; otherwise raises `ValueError`.
+- `refund_amount` (float, required): Amount to refund in BDT. Must be greater than or equal to 1 with at most 2 decimal places; otherwise raises `ValueError`.
 - `sku` (str, optional): SKU/product identifier
 - `reason` (str, optional): Reason for the refund
 

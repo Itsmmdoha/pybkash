@@ -17,7 +17,7 @@ from .models import (
 class BaseClient:
     def _validate_amount(self, amount: float) -> None:
         if amount < 1 or round(amount, 2) != amount:
-            raise ValueError("amount must be at least 1 and at most 2 decimal places")
+            raise ValueError("amount must be greater than or equal to 1 with at most 2 decimal places")
 
     def __init__(self, timeout: int = 10, max_connections: int = 50, max_keepalive_connections: int = 20, keepalive_expiry: float = 20.0) -> None:
         self.timeout = timeout
@@ -233,7 +233,7 @@ class Client(BaseClient):
         Args:
             callback_url: URL where bKash redirects after user authentication
             payer_reference: Unique reference for the payer
-            amount: Payment amount in BDT. At least 1, up to 2 decimal places.
+            amount: Payment amount in BDT. Must be greater than or equal to 1 with at most 2 decimal places.
             agreement_id: Optional agreement ID for tokenized payment (enables PIN-only flow)
             invoice_number: Optional merchant invoice number
             merchant_association_info: Optional merchant association information
@@ -242,7 +242,7 @@ class Client(BaseClient):
             PaymentCreation: Payment creation response with payment_id and bkash_url
         
         Raises:
-            ValueError: If amount is under 1 or has more than 2 decimal places
+            ValueError: If amount is not greater than or equal to 1 or has more than 2 decimal places
             APIError: If payment creation fails
         """
         self._validate_amount(amount)
@@ -375,7 +375,7 @@ class Client(BaseClient):
         Args:
             payment_id: The payment ID from the original payment
             trx_id: The transaction ID from the original payment
-            refund_amount: Amount to refund in BDT. At least 1, up to 2 decimal places.
+            refund_amount: Amount to refund in BDT. Must be greater than or equal to 1 with at most 2 decimal places.
             sku: Optional SKU/product identifier
             reason: Optional reason for the refund
         
@@ -383,7 +383,7 @@ class Client(BaseClient):
             RefundExecution: Refund transaction details including refund_trx_id and status
         
         Raises:
-            ValueError: If refund_amount is under 1 or has more than 2 decimal places
+            ValueError: If refund_amount is not greater than or equal to 1 or has more than 2 decimal places
             APIError: If refund fails
         """
         self._validate_amount(refund_amount)
@@ -488,7 +488,7 @@ class AsyncClient(BaseClient):
         Args:
             callback_url: URL where bKash redirects after user authentication
             payer_reference: Unique reference for the payer
-            amount: Payment amount in BDT. At least 1, up to 2 decimal places.
+            amount: Payment amount in BDT. Must be greater than or equal to 1 with at most 2 decimal places.
             agreement_id: Optional agreement ID for tokenized payment (enables PIN-only flow)
             invoice_number: Optional merchant invoice number
             merchant_association_info: Optional merchant association information
@@ -497,7 +497,7 @@ class AsyncClient(BaseClient):
             PaymentCreation: Payment creation response with payment_id and bkash_url
         
         Raises:
-            ValueError: If amount is under 1 or has more than 2 decimal places
+            ValueError: If amount is not greater than or equal to 1 or has more than 2 decimal places
             APIError: If payment creation fails
         """
         self._validate_amount(amount)
@@ -630,7 +630,7 @@ class AsyncClient(BaseClient):
         Args:
             payment_id: The payment ID from the original payment
             trx_id: The transaction ID from the original payment
-            refund_amount: Amount to refund in BDT. At least 1, up to 2 decimal places.
+            refund_amount: Amount to refund in BDT. Must be greater than or equal to 1 with at most 2 decimal places.
             sku: Optional SKU/product identifier
             reason: Optional reason for the refund
         
@@ -638,7 +638,7 @@ class AsyncClient(BaseClient):
             RefundExecution: RefundExecution transaction details including refund_trx_id and status
         
         Raises:
-            ValueError: If refund_amount is under 1 or has more than 2 decimal places
+            ValueError: If refund_amount is not greater than or equal to 1 or has more than 2 decimal places
             APIError: If refund fails
         """
         self._validate_amount(refund_amount)

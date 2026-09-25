@@ -48,7 +48,7 @@ You can now use this client to perform various operations.
 payment = client.create_payment(
     callback_url="https://yoursite.com/callback",
     payer_reference="CUSTOMER001",  # Passing a phone or bKash number pre-populates the wallet number field on the bKash checkout page.
-    amount=1000  # Amount in BDT. At least 1, up to 2 decimal places.
+    amount=1000  # Amount in BDT. Must be greater than or equal to 1 with at most 2 decimal places.
 )
 ```
 

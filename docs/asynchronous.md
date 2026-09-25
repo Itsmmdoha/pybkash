@@ -96,7 +96,7 @@ async_token = AsyncToken(
 client = AsyncClient(async_token)
 
 @app.post("/create-payment")
-async def create_payment(amount: int, payer_ref: str):
+async def create_payment(amount: float, payer_ref: str):
     payment = await client.create_payment(
         callback_url="https://yoursite.com/callback",
         payer_reference=payer_ref,

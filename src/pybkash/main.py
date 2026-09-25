@@ -15,6 +15,10 @@ from .models import (
 
 
 class BaseClient:
+    def _validate_amount(self, amount: float) -> None:
+        if amount < 1 or round(amount, 2) != amount:
+            raise ValueError("amount must be at least 1 and at most 2 decimal places")
+
     def __init__(self, timeout: int = 10, max_connections: int = 50, max_keepalive_connections: int = 20, keepalive_expiry: float = 20.0) -> None:
         self.timeout = timeout
         self._limits = Limits(max_connections=max_connections, max_keepalive_connections=max_keepalive_connections, keepalive_expiry=keepalive_expiry)
@@ -223,13 +227,13 @@ class Client(BaseClient):
         raise_api_exception(response_json)
         return self._create_agreement_object(response_json)
 
-    def create_payment(self, callback_url: str, payer_reference: str, amount: int, agreement_id: str | None = None, invoice_number: str | None = None, merchant_association_info: str | None = None) -> PaymentCreation: 
+    def create_payment(self, callback_url: str, payer_reference: str, amount: float, agreement_id: str | None = None, invoice_number: str | None = None, merchant_association_info: str | None = None) -> PaymentCreation: 
         """Creates a new bKash payment.
         
         Args:
             callback_url: URL where bKash redirects after user authentication
             payer_reference: Unique reference for the payer
-            amount: Payment amount in BDT
+            amount: Payment amount in BDT. At least 1, up to 2 decimal places.
             agreement_id: Optional agreement ID for tokenized payment (enables PIN-only flow)
             invoice_number: Optional merchant invoice number
             merchant_association_info: Optional merchant association information
@@ -238,8 +242,10 @@ class Client(BaseClient):
             PaymentCreation: Payment creation response with payment_id and bkash_url
         
         Raises:
+            ValueError: If amount is under 1 or has more than 2 decimal places
             APIError: If payment creation fails
         """
+        self._validate_amount(amount)
         data = {  
             "mode": "0011", # mode for url based payment without agreement
             "payerReference": str(payer_reference),
@@ -363,13 +369,13 @@ class Client(BaseClient):
         response: dict = self._query(payment_id)
         return self._create_payment_query_object(response)
 
-    def execute_refund(self, payment_id: str, trx_id: str, refund_amount: int, sku: str | None = None, reason: str | None = None) -> RefundExecution:
+    def execute_refund(self, payment_id: str, trx_id: str, refund_amount: float, sku: str | None = None, reason: str | None = None) -> RefundExecution:
         """Executes a refund for a completed payment.
         
         Args:
             payment_id: The payment ID from the original payment
             trx_id: The transaction ID from the original payment
-            refund_amount: Amount to refund in BDT
+            refund_amount: Amount to refund in BDT. At least 1, up to 2 decimal places.
             sku: Optional SKU/product identifier
             reason: Optional reason for the refund
         
@@ -377,8 +383,10 @@ class Client(BaseClient):
             RefundExecution: Refund transaction details including refund_trx_id and status
         
         Raises:
+            ValueError: If refund_amount is under 1 or has more than 2 decimal places
             APIError: If refund fails
         """
+        self._validate_amount(refund_amount)
         data = {
             "paymentID": payment_id,
             "trxID": trx_id,
@@ -474,13 +482,13 @@ class AsyncClient(BaseClient):
         raise_api_exception(response_json)
         return self._create_agreement_object(response_json)
 
-    async def create_payment(self, callback_url: str, payer_reference: str, amount: int, agreement_id: str | None = None, invoice_number: str | None = None, merchant_association_info: str | None = None) -> PaymentCreation: 
+    async def create_payment(self, callback_url: str, payer_reference: str, amount: float, agreement_id: str | None = None, invoice_number: str | None = None, merchant_association_info: str | None = None) -> PaymentCreation: 
         """Creates a new bKash payment.
         
         Args:
             callback_url: URL where bKash redirects after user authentication
             payer_reference: Unique reference for the payer
-            amount: Payment amount in BDT
+            amount: Payment amount in BDT. At least 1, up to 2 decimal places.
             agreement_id: Optional agreement ID for tokenized payment (enables PIN-only flow)
             invoice_number: Optional merchant invoice number
             merchant_association_info: Optional merchant association information
@@ -489,8 +497,10 @@ class AsyncClient(BaseClient):
             PaymentCreation: Payment creation response with payment_id and bkash_url
         
         Raises:
+            ValueError: If amount is under 1 or has more than 2 decimal places
             APIError: If payment creation fails
         """
+        self._validate_amount(amount)
         data = {  
             "mode": "0011", # mode for url based payment without agreement
             "payerReference": str(payer_reference),
@@ -614,13 +624,13 @@ class AsyncClient(BaseClient):
         response: dict = await self._query(payment_id)
         return self._create_payment_query_object(response)
 
-    async def execute_refund(self, payment_id: str, trx_id: str, refund_amount: int, sku: str | None = None, reason: str | None = None) -> RefundExecution:
+    async def execute_refund(self, payment_id: str, trx_id: str, refund_amount: float, sku: str | None = None, reason: str | None = None) -> RefundExecution:
         """Executes a refund for a completed payment.
         
         Args:
             payment_id: The payment ID from the original payment
             trx_id: The transaction ID from the original payment
-            refund_amount: Amount to refund in BDT
+            refund_amount: Amount to refund in BDT. At least 1, up to 2 decimal places.
             sku: Optional SKU/product identifier
             reason: Optional reason for the refund
         
@@ -628,8 +638,10 @@ class AsyncClient(BaseClient):
             RefundExecution: RefundExecution transaction details including refund_trx_id and status
         
         Raises:
+            ValueError: If refund_amount is under 1 or has more than 2 decimal places
             APIError: If refund fails
         """
+        self._validate_amount(refund_amount)
         data = {
             "paymentID": payment_id,
             "trxID": trx_id,
